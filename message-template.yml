@@ -1,0 +1,60 @@
+apiVersion: 1
+
+# List of templates to import or update
+templates:
+  # <int> organization ID, default = 1
+  - orgID: 1
+    # <string, required> name of the template, must be unique
+    name: Rocket
+    # <string, required> content of the the template
+    template: |
+      {{ define "alert_severity_prefix_emoji" -}}
+        {{- if eq (index .Alerts 0).Labels.severity "info" -}}
+          ℹ️
+        {{- else -}}
+          {{- if eq .Status "firing" -}}
+            💔
+          {{- else -}}
+            ❤️‍🩹
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- define "rocket.title" -}}
+        {{- template "alert_severity_prefix_emoji" . }}	{{ .Status | title }}
+          {{- if eq .Status "firing" }} x {{ .Alerts.Firing | len }}
+        {{- end -}} | {{ .CommonLabels.alertname }}
+      {{- end -}}{{/* Define */}}
+
+      {{ define "rocket.text" -}}
+      ### {{ template "alert_severity_prefix_emoji" . }} 
+      {{- range .Alerts -}}
+      {{ if eq .Labels.severity "info" }}Info{{ else }}{{ .Status | toUpper }}{{ end }} | {{ .Labels.alertname }}
+
+      {{- if gt (len .Annotations) 0 }}
+      **Summary**: {{ .Annotations.summary }} 
+      **Description**: {{ .Annotations.description }}
+      {{- end -}}{{/* if gt Annotations */}}
+
+      {{/* Print labels */}}
+      {{- range .Labels.SortedPairs }}
+      {{- if or (eq .Name "instance") (eq .Name "severity")}}
+      **{{ .Name }}**: `{{ .Value }}`
+      {{- end }}{{/* if Name */}}
+      {{- end -}}{{/* Range Labels */}}
+
+
+      Links:
+
+      {{ if gt (len .GeneratorURL ) 0 }} [alert]({{ .GeneratorURL }}){{ end -}} 
+      {{ if gt (len .DashboardURL ) 0 }} / [dashboard]({{ .DashboardURL }}){{ end -}}
+      {{ if gt (len .PanelURL ) 0 }} / [panel]({{ .PanelURL }}){{ end -}}
+      {{ if gt (len .SilenceURL ) 0 }} / [silence]({{ .SilenceURL }}) {{ end }}
+      {{- end -}}{{/* Range Alerts */}}
+
+      {{ if and (ne (index .Alerts 0).Labels.severity "info") ( eq .Status "firing") }}
+      @all
+      {{ end }}
+
+
+      {{- end -}}{{/* Define */}}

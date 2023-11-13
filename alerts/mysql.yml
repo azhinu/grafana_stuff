@@ -1,0 +1,940 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: MySQL
+      folder: MAIN
+      interval: 1m
+      rules:
+        - uid: yc1TYrPVk
+          title: MySQL slow queries
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: increase(mysql_global_status_slow_queries[$__rate_interval])
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-instance-summary
+          panelId: 1009
+          noDataState: OK
+          execErrState: OK
+          for: 0s
+          annotations:
+            __dashboardUid__: mysql-instance-summary
+            __panelId__: "1009"
+            description: MySQL server has some new slow query
+          labels:
+            severity: info
+          isPaused: false
+        - uid: JBhzdZrnk
+          title: Mysql Connections
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PBFA97CFB590B2093
+                editorMode: code
+                exemplar: true
+                expr: mysql_global_variables_max_connections - mysql_global_status_max_used_connections
+                hide: false
+                interval: ""
+                intervalMs: 15000
+                legendFormat: Free connections
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: min
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 10
+                            - 0
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-instance-summary
+          panelId: 92
+          noDataState: OK
+          execErrState: Alerting
+          for: 5m
+          annotations:
+            __dashboardUid__: mysql-instance-summary
+            __panelId__: "92"
+            description: There are {{ $values.B.Value }} free mysql connections left. Connections limit has to be extended, or some connections have to be closed!
+            summary: MySQL connection limit exceeded
+          labels:
+            severity: warning
+          isPaused: false
+        - uid: 1Y27dZ9nk
+          title: MySQL status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PBFA97CFB590B2093
+                exemplar: true
+                expr: mysql_up{}
+                format: time_series
+                interval: ""
+                intervalFactor: 1
+                intervalMs: 20000
+                legendFormat: ""
+                maxDataPoints: 100
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                            - 0
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-instance-summary
+          panelId: 12
+          noDataState: NoData
+          execErrState: Error
+          for: 0s
+          annotations:
+            __dashboardUid__: mysql-instance-summary
+            __panelId__: "12"
+            summary: MySQL is down!
+          labels:
+            severity: critical
+          isPaused: false
+        - uid: OBe3LrE4z
+          title: MySQL log writes staling
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: rate(mysql_global_status_innodb_log_waits[15m])
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 10
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: OK
+          execErrState: OK
+          for: 0s
+          annotations:
+            description: |-
+                MySQL innodb log writes stalling
+
+                Value: **{{ $values.B.Value }}**
+          labels:
+            severity: critical
+          isPaused: false
+        - uid: B_Q5BmgIz
+          title: MySQL Client Thread Activity
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 43200
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                calculatedInterval: 2m
+                datasource:
+                    type: prometheus
+                    uid: PBFA97CFB590B2093
+                datasourceErrors: {}
+                editorMode: code
+                errors: {}
+                expr: max_over_time(mysql_global_status_threads_running[1m]) / mysql_global_variables_max_connections * 100
+                format: time_series
+                hide: false
+                interval: 5m
+                intervalFactor: 1
+                intervalMs: 15000
+                legendFormat: Peak Threads Connected
+                maxDataPoints: 43200
+                metric: ""
+                range: true
+                refId: A
+                step: 20
+            - refId: B
+              relativeTimeRange:
+                from: 43200
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - D
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 43200
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 60
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - E
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-instance-summary
+          panelId: 10
+          noDataState: OK
+          execErrState: OK
+          for: 0s
+          annotations:
+            __dashboardUid__: mysql-instance-summary
+            __panelId__: "10"
+            description: '**{{ $values.B.Value }}%** of MySQL connections are in running state.'
+            summary: MySQL high client activity
+          labels:
+            severity: warning
+          isPaused: false
+        - uid: WlmlBmgIz
+          title: MySQL slave IO thread status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: mysql_slave_status_slave_io_running and ON (instance) mysql_slave_status_master_server_id > 0
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-replicaset-summary
+          panelId: 26
+          noDataState: OK
+          execErrState: OK
+          for: 0s
+          annotations:
+            __dashboardUid__: mysql-replicaset-summary
+            __panelId__: "26"
+            summary: MySQL slave IO thread not running
+          labels:
+            severity: critical
+          isPaused: false
+        - uid: k7EmYigSk
+          title: MySQL slave SQL thread status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: mysql_slave_status_slave_sql_running and ON (instance) mysql_slave_status_master_server_id > 0
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-replicaset-summary
+          panelId: 17
+          noDataState: OK
+          execErrState: OK
+          for: 0s
+          annotations:
+            __dashboardUid__: mysql-replicaset-summary
+            __panelId__: "17"
+            summary: MySQL slave SQL thread not running
+          labels:
+            severity: critical
+          isPaused: false
+        - uid: xrl5LmRIz
+          title: MySQL Replication Lag
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                calculatedInterval: 2m
+                datasource:
+                    type: prometheus
+                    uid: PBFA97CFB590B2093
+                datasourceErrors: {}
+                editorMode: code
+                errors: {}
+                expr: '(mysql_slave_status_seconds_behind_master - mysql_slave_status_sql_delay) '
+                format: time_series
+                interval: 5m
+                intervalFactor: 1
+                intervalMs: 15000
+                legendFormat: Lag
+                maxDataPoints: 43200
+                metric: ""
+                range: true
+                refId: A
+                step: 300
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 30
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: mysql-replicaset-summary
+          panelId: 16
+          noDataState: OK
+          execErrState: OK
+          for: 6m
+          annotations:
+            __dashboardUid__: mysql-replicaset-summary
+            __panelId__: "16"
+            description: MySQL Slave replication lag is **{{ $values.B.Value }}** seconds.
+            summary: MySQL Slave replication lag
+          labels:
+            severity: warning
+          isPaused: false
+    - orgId: 1
+      name: Network errors
+      folder: MAIN
+      interval: 1m
+      rules:
+        - uid: zRS8ShYVz
+          title: Network Receive Traffic Errors
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PBFA97CFB590B2093
+                editorMode: code
+                expr: rate(node_network_receive_errs_total{device="eth0"} [2m]) / rate(node_network_receive_packets_total[2m])
+                format: time_series
+                interval: ""
+                intervalFactor: 1
+                intervalMs: 15000
+                legendFormat: '{{device}} - Receive errors'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+                step: 240
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0.01
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - D
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rYdddlPWk
+          panelId: 142
+          noDataState: OK
+          execErrState: OK
+          for: 2m
+          annotations:
+            __dashboardUid__: rYdddlPWk
+            __panelId__: "142"
+            description: Host **{{ $labels.instance }}** has encountered **{{ humanize $values.B.Value }}** receive errors in the last two minutes.
+            summary: Host Network Receive Errors
+          labels:
+            severity: warning
+          isPaused: false
+        - uid: qd9uShYVk
+          title: Network Traffic Errors
+          condition: D
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PBFA97CFB590B2093
+                editorMode: code
+                expr: rate(node_network_transmit_errs_total{device="eth0"}[2m]) / rate(node_network_transmit_packets_total[2m])
+                format: time_series
+                interval: ""
+                intervalFactor: 1
+                intervalMs: 15000
+                legendFormat: '{{device}} - Receive errors'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+                step: 240
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: C
+                type: reduce
+            - refId: D
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0.01
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - D
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: C
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: D
+                type: threshold
+          dashboardUid: rYdddlPWk
+          panelId: 142
+          noDataState: OK
+          execErrState: OK
+          for: 2m
+          annotations:
+            __dashboardUid__: rYdddlPWk
+            __panelId__: "142"
+            description: Host **{{ $labels.instance }}** has encountered **{{ $values.B.Value }}** transmit errors in the last two minutes.
+            summary: Host Network Transmit Errors
+          labels:
+            severity: warning
+          isPaused: false
